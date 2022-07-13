@@ -38,8 +38,15 @@ contract Tether{
           return true;
     }
 
+    function approve(address _spender, uint _value) public returns(bool success) {
+        allowance[msg.sender][_spender] = _value;
+        emit Approve(msg.sender, _spender, _value);
+        return true;
+    }
+
     function transferFrom(address _from, address _to, uint _value) public returns(bool) {
           require(balance[_from] >= _value, "Insufficient balance.");
+          require(_value <= allowance[_from][msg.sender]);
           balance[_from] -= _value;
           balance[_to] += _value;
 

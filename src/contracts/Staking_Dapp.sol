@@ -36,7 +36,7 @@ contract Staking_Dapp{
         hasStaked[msg.sender] = true;
     }
 
-    function unstakingTokens() public {
+    function unstakeTokens() public {
         uint balance = stakingBalance[msg.sender];
         require(balance > 0, "No staked tokens.");
 

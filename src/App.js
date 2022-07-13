@@ -1,10 +1,110 @@
 import logo from './logo.svg';
 import './App.css';
+import Web3 from 'web3';
+import TetherToken from './src/build/Tether.json';
+import DummyToken from './src/build/Token.json';
+import StakingDapp from './src/build/Staking_Dapp.json';
+import { Component } from 'react';
+
+//Main app class. Contains all content and state changes.
+class App extends Component {
+
+  async componentwillmount() {
+    await this.loadWeb3() //predefined function to load web3
+    await this.loadBlockchainData()
+  }
+
+  async loadBlockchainData() {
+    const web3 = window.web3
+
+    const accounts = await web3.eth.Accounts()
+    //setstate tells react to rerender the component as the set of the component has changed
+    this.setstate({account : accounts[0]}) 
+
+    const networkId = await web3.eth.net.getId()
+
+    const TetherTokenData = await TetherToken.networks[networkId]
+    if(TetherTokenData) {
+      const tetherToken = new web3.eth.Contracts(TetherToken.abi, TetherTokenData.address)
+      this.setstate({tetherToken})
+
+      let tetherTokenBalance = await tetherToken.balance(this.state.account).call()
+      this.setstate({tetherTokenBalance : tetherTokenBalance.toString()})
+    }
+
+    const DummyTokenData = await DummyToken.networks[networkId]
+    if(DummyTokenData) {
+      const dummyToken = new web3.eth.Contracts(DummyToken.abi, DummyTokenData.address)
+      this.setstate({dummyToken})
+
+      let dummyTokenBalance = await dummyToken.balance(this.state.account).call()
+      this.setstate({dummyTokenBalance : dummyTokenBalance.toString()})
+    }
+
+    const StakingDappData = await StakingDapp.networks[networkId]
+    if(StakingDappData) {
+      const stakingDapp = new web3.eth.Contracts(StakingDapp.abi, StakingDappData.address)
+      this.setstate({stakingDapp})
+
+      let stakingDappBalance = await dummyToken.stakingBalance(this.state.account).call()
+      this.setstate({stakingDappBalance : stakingDappBalance.toString()})
+    }
+
+  }
+
+  //connecting we3 and metamask to dapp
+  async loadWeb3() {
+    if (window.ethereum) {
+      window.web3 = new Web3(window.ethereum)
+      await window.ethereum.enable()
+    }
+    else if (window.web3) {
+      window.web3 = new Web3(window.web3.currentProvider)
+    }
+    else {
+      window.alert('Non-Ethereum browser detected. You should consider trying MetaMask!')
+    }
+  }
+
+  stakeTokens = (amount) => {
+    this.setstate({loading: true})
+    this.state.tetherToken.methods.approve(this.state.stakingDapp.address, amount).send({from: this.state.account}).on('transactionHash', (hash) => {
+      this.state.stakingDapp.methods.stakeTokens(amount).send({from: this.state.account}).on('transactionHash', (hash) => {
+        this.setstate({loading:false})
+      })
+    })
+  }
+
+  unstakeTokens = (amount) => {
+    this.setstate({loading: true})
+    this.state.stakingDapp.methods.unstakeTokens().send({from: this.state.account}).on('transactionHash', (hash) => {
+        this.setstate({loading:false})
+      })
+  }
+
+
+  constructor(props) {
+    super(props)
+    this.state = {
+      account = '0x0',
+      tetherToken: {},
+      dummyToken: {},
+      stakingDapp: {},
+      tetherTokenBalance: '0',
+      dummyTokenBalance: '0',
+      stakingDappBalance: '0',
+      loading: true
+    }
+  }
+
+  render() {
+    
+  }
 
 
 
 
-
+}
 
 
 function App() {
