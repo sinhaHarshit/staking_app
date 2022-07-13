@@ -10,6 +10,7 @@
 
 # production
 /build
+staking_app/src/build
 
 # misc
 .DS_Store
