@@ -17,37 +17,37 @@ class App extends Component {
   async loadBlockchainData() {
     const web3 = window.web3
 
-    const accounts = await web3.eth.Accounts()
-    //setstate tells react to rerender the component as the set of the component has changed
-    this.setstate({account : accounts[0]}) 
+    const accounts = await web3.eth.getAccounts()
+    //setState tells react to rerender the component as the set of the component has changed
+    this.setState({account : accounts[0]}) 
 
     const networkId = await web3.eth.net.getId()
 
     const TetherTokenData = await TetherToken.networks[networkId]
     if(TetherTokenData) {
       const tetherToken = new web3.eth.Contracts(TetherToken.abi, TetherTokenData.address)
-      this.setstate({tetherToken})
+      this.setState({tetherToken})
 
       let tetherTokenBalance = await tetherToken.balance(this.state.account).call()
-      this.setstate({tetherTokenBalance : tetherTokenBalance.toString()})
+      this.setState({tetherTokenBalance : tetherTokenBalance.toString()})
     }
 
     const DummyTokenData = await DummyToken.networks[networkId]
     if(DummyTokenData) {
       const dummyToken = new web3.eth.Contracts(DummyToken.abi, DummyTokenData.address)
-      this.setstate({dummyToken})
+      this.setState({dummyToken})
 
       let dummyTokenBalance = await dummyToken.balance(this.state.account).call()
-      this.setstate({dummyTokenBalance : dummyTokenBalance.toString()})
+      this.setState({dummyTokenBalance : dummyTokenBalance.toString()})
     }
 
     const StakingDappData = await StakingDapp.networks[networkId]
     if(StakingDappData) {
       const stakingDapp = new web3.eth.Contracts(StakingDapp.abi, StakingDappData.address)
-      this.setstate({stakingDapp})
+      this.setState({stakingDapp})
 
       let stakingDappBalance = await dummyToken.stakingBalance(this.state.account).call()
-      this.setstate({stakingDappBalance : stakingDappBalance.toString()})
+      this.setState({stakingDappBalance : stakingDappBalance.toString()})
     }
 
   }
@@ -67,18 +67,18 @@ class App extends Component {
   }
 
   stakeTokens = (amount) => {
-    this.setstate({loading: true})
+    this.setState({loading: true})
     this.state.tetherToken.methods.approve(this.state.stakingDapp.address, amount).send({from: this.state.account}).on('transactionHash', (hash) => {
       this.state.stakingDapp.methods.stakeTokens(amount).send({from: this.state.account}).on('transactionHash', (hash) => {
-        this.setstate({loading:false})
+        this.setState({loading:false})
       })
     })
   }
 
   unstakeTokens = (amount) => {
-    this.setstate({loading: true})
+    this.setState({loading: true})
     this.state.stakingDapp.methods.unstakeTokens().send({from: this.state.account}).on('transactionHash', (hash) => {
-        this.setstate({loading:false})
+        this.setState({loading:false})
       })
   }
 
@@ -90,7 +90,7 @@ class App extends Component {
       tetherToken: {},
       dummyToken: {},
       stakingDapp: {},
-      tetherTokenBalance: '0',
+      tetherTokenBalance: '0',   
       dummyTokenBalance: '0',
       stakingDappBalance: '0',
       loading: true
@@ -98,7 +98,7 @@ class App extends Component {
   }
 
   render() {
-    
+
   }
 
 
