@@ -1,15 +1,15 @@
 import logo from './logo.svg';
-import './App.css';
 import Web3 from 'web3';
-import TetherToken from './src/build/Tether.json';
-import DummyToken from './src/build/Token.json';
-import StakingDapp from './src/build/Staking_Dapp.json';
-import { Component } from 'react';
+import TetherToken from './build/Tether.json'; 
+import DummyToken from './build/Token.json';
+import StakingDapp from './build/Staking_Dapp.json';
+import React, { Component } from 'react';
+import './App.css';
 
 //Main app class. Contains all content and state changes.
-class App extends Component {
+class DApp extends Component {
 
-  async componentwillmount() {
+  async componentWillMount() {
     await this.loadWeb3() //predefined function to load web3
     await this.loadBlockchainData()
   }
@@ -46,7 +46,7 @@ class App extends Component {
       const stakingDapp = new web3.eth.Contracts(StakingDapp.abi, StakingDappData.address)
       this.setState({stakingDapp})
 
-      let stakingDappBalance = await dummyToken.stakingBalance(this.state.account).call()
+      let stakingDappBalance = await stakingDapp.stakingBalance(this.state.account).call()
       this.setState({stakingDappBalance : stakingDappBalance.toString()})
     }
 
@@ -86,7 +86,7 @@ class App extends Component {
   constructor(props) {
     super(props)
     this.state = {
-      account = '0x0',
+      account : '0x0',
       tetherToken: {},
       dummyToken: {},
       stakingDapp: {},
@@ -98,7 +98,7 @@ class App extends Component {
   }
 
   render() {
-
+      return (<p></p>);
   }
 
 
